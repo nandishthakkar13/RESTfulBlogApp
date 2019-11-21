@@ -29,3 +29,13 @@
 * Add Update Route
 * Add Update Form
 * Add Method-Override
+
+# Destroy
+* Add Destory Route
+* Add Edit and Destroy Links
+
+## Final Updates
+* Sanitize blog body
+* Style Index
+* Update REST Table
+ 

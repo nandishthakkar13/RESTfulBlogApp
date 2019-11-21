@@ -6,6 +6,8 @@ var bodyParser = require("body-parser");
 
 var methodOverride = require("method-override");
 
+var expressSanitizer = require("express-sanitizer");
+
 var mongoose =  require("mongoose"); 
 
 mongoose.set('useNewUrlParser', true);
@@ -18,7 +20,8 @@ mongoose.connect("mongodb://localhost/restful_blog_app");
 app.set("view engine", "ejs");
 app.use(express.static("public"));
 app.use(bodyParser.urlencoded({extended:true}));
-app.use(methodOverride("_method"));
+app.use(expressSanitizer());
+app.use(methodOverride("_method") );
 //MONGOOSE/MODEL CONFIG
 var blogSchema = new mongoose.Schema({
     title:String,
@@ -63,6 +66,8 @@ app.get("/blogs/new", (req, res) => {
 //POST ROUTE (CREATE)
 app.post("/blogs",(req, res) => {
     //create blog
+    req.body.blog.body = req.sanitize(req.body.blog.body);
+
     Blog.create(req.body.blog, (err, newBlog) => {
         if(err){
             res.render("new");
@@ -105,6 +110,8 @@ app.get("/blogs/:id/edit", (req,res) => {
 //UPDATE ROUTE
 app.put("/blogs/:id", (req,res)=>{
 
+    req.body.blog.body = req.sanitize(req.body.blog.body);
+    
     Blog.findByIdAndUpdate(req.params.id,req.body.blog, (err,updatedblog)=>{
         if(err){
             res.redirect("/blogs");
@@ -115,6 +122,20 @@ app.put("/blogs/:id", (req,res)=>{
     
    
 })
+
+// DELETE ROUTE
+app.delete("/blogs/:id", (req,res)=> {
+   
+    Blog.findByIdAndRemove(req.params.id, (err) => {
+
+        if(err){
+            res.redirect("/blogs");
+        }
+        else {
+            res.redirect("/blogs");
+        }
+    })
+});
 
 app.listen(3000,() => {
     console.log("Listening on server");
